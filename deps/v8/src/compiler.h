@@ -229,6 +229,7 @@ class CompilationInfo {
     SetMode(OPTIMIZE);
     osr_ast_id_ = osr_ast_id;
     unoptimized_code_ = unoptimized;
+    optimization_id_ = isolate()->NextOptimizationId();
   }
   void DisableOptimization();
 
@@ -316,6 +317,8 @@ class CompilationInfo {
   bool HasSameOsrEntry(Handle<JSFunction> function, BailoutId osr_ast_id) {
     return osr_ast_id_ == osr_ast_id && function.is_identical_to(closure_);
   }
+
+  int optimization_id() const { return optimization_id_; }
 
  protected:
   CompilationInfo(Handle<Script> script,
@@ -451,6 +454,8 @@ class CompilationInfo {
   bool this_has_uses_;
 
   Handle<Foreign> object_wrapper_;
+
+  int optimization_id_;
 
   DISALLOW_COPY_AND_ASSIGN(CompilationInfo);
 };

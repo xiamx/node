@@ -680,6 +680,19 @@ void HValue::ComputeInitialRange(Zone* zone) {
 }
 
 
+void HSourcePosition::PrintTo(FILE* out) {
+  if (IsUnknown()) {
+    PrintF(out, "<?>");
+  } else {
+    if (FLAG_hydrogen_track_positions) {
+      PrintF(out, "<%d:%d>", inlining_id(), position());
+    } else {
+      PrintF(out, "<0:%d>", raw());
+    }
+  }
+}
+
+
 void HInstruction::PrintTo(StringStream* stream) {
   PrintMnemonicTo(stream);
   PrintDataTo(stream);
@@ -736,8 +749,7 @@ void HInstruction::InsertBefore(HInstruction* next) {
   next_ = next;
   previous_ = prev;
   SetBlock(next->block());
-  if (position() == RelocInfo::kNoPosition &&
-      next->position() != RelocInfo::kNoPosition) {
+  if (!has_position() && next->has_position()) {
     set_position(next->position());
   }
 }
@@ -774,8 +786,7 @@ void HInstruction::InsertAfter(HInstruction* previous) {
   if (block->last() == previous) {
     block->set_last(this);
   }
-  if (position() == RelocInfo::kNoPosition &&
-      previous->position() != RelocInfo::kNoPosition) {
+  if (!has_position() && previous->has_position()) {
     set_position(previous->position());
   }
 }
@@ -1647,7 +1658,7 @@ Range* HConstant::InferRange(Zone* zone) {
 }
 
 
-int HPhi::position() const {
+HSourcePosition HPhi::position() const {
   return block()->first()->position();
 }
 

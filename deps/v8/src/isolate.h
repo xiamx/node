@@ -1153,6 +1153,14 @@ class Isolate {
   // Given an address occupied by a live code object, return that object.
   Object* FindCodeObject(Address a);
 
+  int NextOptimizationId() {
+    int id = next_optimization_id_++;
+    if (!Smi::IsValid(next_optimization_id_)) {
+      next_optimization_id_ = 0;
+    }
+    return id;
+  }
+
  private:
   Isolate();
 
@@ -1383,6 +1391,8 @@ class Isolate {
 
   // Counts deopt points if deopt_every_n_times is enabled.
   unsigned int stress_deopt_count_;
+
+  int next_optimization_id_;
 
   friend class ExecutionAccess;
   friend class HandleScopeImplementer;
